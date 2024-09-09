@@ -3,7 +3,15 @@ import ProductCard from "./ProductCard";
 import { Input } from "@/components/ui/input";
 import { Search, ShoppingCart, User } from "lucide-react";
 import { useCart } from "@/context/CartContext"; // Import the CartContext
-
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import Cart from "./Cart";
 interface Product {
   id: string;
   name: string;
@@ -98,14 +106,25 @@ const ProductsPage = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="relative cursor-pointer">
-              <ShoppingCart className="text-gray-500" size={24} />
-              {cartItemCount > 0 && (
-                <span className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                  {cartItemCount}
-                </span>
-              )}
-            </div>
+            <Sheet>
+              <SheetTrigger>
+                <div className="relative cursor-pointer">
+                  <ShoppingCart className="text-gray-500" size={24} />
+                  {cartItemCount > 0 && (
+                    <span className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      {cartItemCount}
+                    </span>
+                  )}
+                </div>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Cart Items</SheetTitle>
+                </SheetHeader>
+                <Cart />
+              </SheetContent>
+            </Sheet>
+
             <User className="text-gray-500" size={24} />
           </div>
         </div>
