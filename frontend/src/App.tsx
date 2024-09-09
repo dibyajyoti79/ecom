@@ -1,8 +1,12 @@
-import AuthPage from "./pages/AuthPage";
-import Login from "./pages/Login";
+import { CartProvider } from "./context/CartContext";
+import Products from "./pages/Home/Products";
 
 function App() {
-  return <AuthPage />;
+  return (
+    <CartProvider>
+      <Products />
+    </CartProvider>
+  );
 }
 
 export default App;
