@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/context/AuthContext";
 import { useState, FormEvent } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 
 const Login = ({ switchToSignUp }: { switchToSignUp: () => void }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  // const navigate = useNavigate();
-
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     // Handle login logic here
@@ -17,6 +20,10 @@ const Login = ({ switchToSignUp }: { switchToSignUp: () => void }) => {
       console.log({ email, password });
       // Navigate to home page or dashboard
       // navigate("/dashboard");
+      // await login(formData.username, formData.password);
+      // Redirect to the original location or home
+      const redirectPath = (location.state as any)?.from || "/";
+      navigate(redirectPath);
     } catch (error) {
       console.error("Login failed:", error);
     }

@@ -12,6 +12,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Cart from "./Cart";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 interface Product {
   id: string;
   name: string;
@@ -67,6 +69,8 @@ const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>(dummyProducts);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { cart } = useCart(); // Get the cart context
+  const { isAuthenticated } = useAuth(); // Get the cart context
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Simulate API call with dummy data
@@ -86,6 +90,9 @@ const ProductsPage = () => {
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const cartItemCount = cart.length;
+  const handleSignIn = () => {
+    navigate("/auth");
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -125,7 +132,13 @@ const ProductsPage = () => {
               </SheetContent>
             </Sheet>
 
-            <User className="text-gray-500" size={24} />
+            {!isAuthenticated && (
+              <User
+                className="text-gray-500 cursor-pointer"
+                size={24}
+                onClick={handleSignIn}
+              />
+            )}
           </div>
         </div>
       </header>
