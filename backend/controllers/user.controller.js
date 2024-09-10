@@ -59,3 +59,7 @@ export const login = asyncHandler(async (req, res, next) => {
     )
   );
 });
+
+export const checkAdmin = asyncHandler(async (req, res) => {
+  res.status(200).json(new ApiResponse(200, null, "User is an admin"));
+});
