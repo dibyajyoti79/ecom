@@ -35,32 +35,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
+    const toastId = toast.loading("Logging in...");
     try {
       const response = await fetch("/api/v1/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
+      // Check if the response is not OK
       if (!response.ok) {
-        throw new Error("Login failed");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
       }
 
       const data = await response.json();
-      const { token, user: userDetails } = data;
-
+      const { token, user: userDetails } = data.data;
       Cookies.set("authToken", token, { expires: 1 });
       localStorage.setItem("user", JSON.stringify(userDetails));
 
       setUser(userDetails);
       setIsAuthenticated(true);
       navigate("/");
-    } catch (error) {
-      // Handle login error
+    } catch (error: any) {
+      toast.error(error.message);
       console.error("Login failed", error);
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 

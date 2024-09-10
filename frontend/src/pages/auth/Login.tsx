@@ -3,28 +3,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { useState, FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    //validate email with regex
+    if (!email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+      toast.error("Enter a valid email");
+      return;
+    }
+    setLoading(true);
     try {
-      // Replace with your login API call
-      console.log({ email, password });
-      // Navigate to home page or dashboard
-      // navigate("/dashboard");
-      // await login(formData.username, formData.password);
-      // Redirect to the original location or home
-      const redirectPath = (location.state as any)?.from || "/";
-      navigate(redirectPath);
-    } catch (error) {
-      console.error("Login failed:", error);
+      await login(email, password);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,8 +55,8 @@ const Login = () => {
               required
             />
           </div>
-          <Button type="submit" className="w-full">
-            Login
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Logging In..." : "Login"}
           </Button>
         </form>
         <div className="mt-4 text-center">
