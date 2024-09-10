@@ -89,9 +89,12 @@ const Header: React.FC<HeaderProps> = ({ searchTerm, setSearchTerm }) => {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="mr-3">
-                <DropdownMenuItem onClick={() => navigate("/admin")}>
-                  Manage
-                </DropdownMenuItem>
+                {user?.role === "admin" && (
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    Manage
+                  </DropdownMenuItem>
+                )}
+
                 <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

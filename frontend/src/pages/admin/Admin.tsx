@@ -18,6 +18,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Offers from "@/components/admin/Offers";
 
 interface Product {
   _id: string;
@@ -127,7 +130,7 @@ const AdminPanel = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            <Link to="/">Home</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -136,32 +139,43 @@ const AdminPanel = () => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="mt-4">
-        <Button onClick={handleAddNewProduct}>Add New Product</Button>
+      <Tabs defaultValue="products" className="mt-6">
+        <TabsList className="w-1/4 grid grid-cols-2">
+          <TabsTrigger value="products">Products</TabsTrigger>
+          <TabsTrigger value="Offers">Offers</TabsTrigger>
+        </TabsList>
+        <TabsContent value="products">
+          <div className="mt-4">
+            <Button onClick={handleAddNewProduct}>Add New Product</Button>
 
-        <Dialog open={isDialogOpen} onOpenChange={closeDialog}>
-          <DialogContent
-            onInteractOutside={(e) => {
-              e.preventDefault(); // Prevent closing on outside click
-            }}
-          >
-            <DialogHeader>
-              <DialogTitle>
-                {selectedProduct ? "Edit Product" : "Add a New Product"}
-              </DialogTitle>
-            </DialogHeader>
-            <ProductInfo
-              product={selectedProduct || undefined}
-              fetchProducts={fetchProducts}
-              setIsDialogOpen={setIsDialogOpen}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+            <Dialog open={isDialogOpen} onOpenChange={closeDialog}>
+              <DialogContent
+                onInteractOutside={(e) => {
+                  e.preventDefault(); // Prevent closing on outside click
+                }}
+              >
+                <DialogHeader>
+                  <DialogTitle>
+                    {selectedProduct ? "Edit Product" : "Add a New Product"}
+                  </DialogTitle>
+                </DialogHeader>
+                <ProductInfo
+                  product={selectedProduct || undefined}
+                  fetchProducts={fetchProducts}
+                  setIsDialogOpen={setIsDialogOpen}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
 
-      <div className="mx-auto my-4">
-        <ProductTable columns={columns} data={products} />
-      </div>
+          <div className="mx-auto my-4">
+            <ProductTable columns={columns} data={products} />
+          </div>
+        </TabsContent>
+        <TabsContent value="Offers">
+          <Offers />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
