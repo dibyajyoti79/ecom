@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/context/CartContext"; // Import the CartContext
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 
 const Cart = () => {
-  const { cart } = useCart(); // Get the cart context
+  const { cart } = useCart();
+  const { isAuthenticated } = useAuth();
 
   // Calculate total price
   const totalPrice = cart.reduce(
@@ -46,9 +48,13 @@ const Cart = () => {
         )}
       </div>
 
-      <div className="py-4">
-        <Button className="w-full">Proceed to Checkout</Button>
-      </div>
+      {cart.length > 0 && (
+        <div className="py-4">
+          <Button className="w-full">
+            {isAuthenticated ? "Proceed to Checkout" : "Login to Checkout"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

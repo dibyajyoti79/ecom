@@ -3,13 +3,19 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { useCart } from "@/context/CartContext";
 import { Minus, Plus } from "lucide-react";
-
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 interface ProductCardProps {
   id: string;
   name: string;
   description: string;
   price: number;
-  imageUrl: string;
+  stock: number;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -17,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   name,
   description,
   price,
-  imageUrl,
+  stock,
 }) => {
   const { cart, addToCart, updateQuantity } = useCart();
   const [quantity, setQuantity] = useState<number>(0);
@@ -57,20 +63,29 @@ const ProductCard: React.FC<ProductCardProps> = ({
         name,
         price,
         quantity: 1,
-        imageUrl,
       });
     }
   };
 
   return (
-    <div className="border rounded-lg overflow-hidden shadow-md bg-white">
-      <img src={imageUrl} alt={name} className="w-full h-40 object-cover" />
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-2">{name}</h3>
-        <p className="text-sm text-gray-600 mb-2">{description}</p>
-        <p className="text-xl font-bold mb-4">₹{price.toFixed(2)}</p>
+    <Card className="bg-white shadow-lg rounded-md overflow-hidden hover:shadow-xl transition-shadow duration-300 ease-in-out w-[350px]">
+      <CardHeader className="p-4">
+        <CardTitle className="text-lg font-bold">{name}</CardTitle>
+        <CardDescription className="text-gray-500 mt-1 text-sm">
+          {description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-4 flex justify-between items-center">
+        <div className="space-y-1">
+          <h3 className="text-lg font-bold">₹{price.toFixed(2)}</h3>
+          {stock > 0 ? (
+            <p className="text-green-500 text-sm">In Stock</p>
+          ) : (
+            <p className="text-red-500 text-sm">Out of Stock</p>
+          )}
+        </div>
         {itemInCart ? (
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 mt-auto">
             <Button
               onClick={handleDecrease}
               className="rounded-full"
@@ -78,7 +93,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             >
               <Minus size={20} />
             </Button>
-            <span className="text-lg">{itemInCart.quantity}</span>
+            <span className="text-lg font-semibold">{itemInCart.quantity}</span>
             <Button
               onClick={handleIncrease}
               className="rounded-full"
@@ -88,10 +103,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </Button>
           </div>
         ) : (
-          <Button onClick={handleAddToCart}>Add to Cart</Button>
+          <Button onClick={handleAddToCart} className="mt-auto">
+            Add to Cart
+          </Button>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

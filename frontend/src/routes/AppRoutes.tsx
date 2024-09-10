@@ -1,19 +1,18 @@
-// src/routes/AppRoutes.tsx
 import { Route, Routes, Navigate } from "react-router-dom";
 
 import { useAuth } from "@/context/AuthContext";
-import ProductsPage from "@/pages/Home/Products";
 import AdminPanel from "@/pages/admin/Admin";
 import NotFound from "@/pages/NotFound";
 import SignUp from "@/pages/auth/Signup";
 import Login from "@/pages/auth/Login";
+import HomePage from "@/pages/Home/HomePage";
 
 const AppRoutes = () => {
   const { isAuthenticated, user } = useAuth();
 
   return (
     <Routes>
-      <Route path="/" element={<ProductsPage />} />
+      <Route path="/" element={<HomePage />} />
       <Route
         path="/admin"
         element={

@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("user");
     setIsAuthenticated(false);
     setUser(null);
-    navigate("/");
+    navigate("/login");
   };
 
   return (
