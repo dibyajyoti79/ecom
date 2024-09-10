@@ -18,9 +18,11 @@ import { errorMiddleware } from "./middleware/error.middleware.js";
 
 import userRoutes from "./routes/user.routes.js";
 import productRoutes from "./routes/product.routes.js";
+import logRoutes from "./routes/log.routes.js";
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/logs", logRoutes);
 
 // error handler middleware
 app.use(errorMiddleware);
