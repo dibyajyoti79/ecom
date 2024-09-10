@@ -9,9 +9,9 @@ import {
 
 const router = express.Router();
 
-router.route("/get-all").get(getAllProducts);
-router.route("/create").post(isAuthenticated, isAdmin, createProduct);
-router.route("/update/:id").put(isAuthenticated, isAdmin, updateProduct);
-router.route("/delete/:id").delete(isAuthenticated, isAdmin, deleteProduct);
+router.route("/").get(getAllProducts);
+router.route("/").post(isAuthenticated, isAdmin, createProduct);
+router.route("/:id").put(isAuthenticated, isAdmin, updateProduct);
+router.route("/:id").delete(isAuthenticated, isAdmin, deleteProduct);
 
 export default router;
