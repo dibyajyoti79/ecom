@@ -1,17 +1,15 @@
 // src/routes/AppRoutes.tsx
-import React from "react";
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 import { useAuth } from "@/context/AuthContext";
 import ProductsPage from "@/pages/Home/Products";
 import AdminPanel from "@/pages/admin/Admin";
 import NotFound from "@/pages/NotFound";
-import AuthPage from "@/pages/AuthPage";
+import SignUp from "@/pages/auth/Signup";
+import Login from "@/pages/auth/Login";
 
 const AppRoutes = () => {
   const { isAuthenticated, user } = useAuth();
-  const location = useLocation();
-  const redirectPath = location.state?.from?.pathname || "/";
 
   return (
     <Routes>
@@ -20,17 +18,18 @@ const AppRoutes = () => {
         path="/admin"
         element={
           isAuthenticated ? (
-            user?.isAdmin ? (
+            user?.role === "admin" ? (
               <AdminPanel />
             ) : (
               <NotFound />
             )
           ) : (
-            <Navigate to="/auth" state={{ from: redirectPath }} />
+            <Navigate to="/" />
           )
         }
       />
-      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

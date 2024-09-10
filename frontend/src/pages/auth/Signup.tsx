@@ -1,22 +1,42 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/context/AuthContext";
 import { useState, FormEvent } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-const SignUp = ({ switchToLogin }: { switchToLogin: () => void }) => {
+const SignUp = () => {
+  const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Handle sign-up logic here
+    //validate email with regex
+    if (!email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+      toast.error("Enter a valid email");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+
     try {
-      // Replace with your sign-up API call
-      console.log({ email, password, confirmPassword });
-      // Navigate to home page or login page
-    } catch (error) {
-      console.error("Sign-up failed:", error);
+      await register(name, email, password);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -25,6 +45,17 @@ const SignUp = ({ switchToLogin }: { switchToLogin: () => void }) => {
       <div className="max-w-md w-full p-6 border rounded shadow-md bg-white">
         <h2 className="text-2xl mb-6 text-center font-semibold">Sign Up</h2>
         <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              type="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              required
+            />
+          </div>
           <div className="mb-4">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -58,15 +89,15 @@ const SignUp = ({ switchToLogin }: { switchToLogin: () => void }) => {
               required
             />
           </div>
-          <Button type="submit" className="w-full">
-            Sign Up
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing Up..." : "Sign Up"}
           </Button>
         </form>
         <div className="mt-4 text-center">
           <p>
             Already have an account?{" "}
             <button
-              onClick={switchToLogin}
+              onClick={() => navigate("/login")}
               className="text-blue-500 hover:underline"
             >
               Login

@@ -4,9 +4,8 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { useState, FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
 
-const Login = ({ switchToSignUp }: { switchToSignUp: () => void }) => {
+const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const location = useLocation();
@@ -64,7 +63,7 @@ const Login = ({ switchToSignUp }: { switchToSignUp: () => void }) => {
           <p>
             Don't have an account?{" "}
             <button
-              onClick={switchToSignUp}
+              onClick={() => navigate("/signup")}
               className="text-blue-500 hover:underline"
             >
               Sign Up

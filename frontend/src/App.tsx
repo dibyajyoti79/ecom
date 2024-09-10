@@ -1,18 +1,16 @@
-// src/App.tsx
-import React from "react";
-import { BrowserRouter as Router } from "react-router-dom"; // Ensure Router is imported
+import { BrowserRouter as Router } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import AppRoutes from "./routes/AppRoutes";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <Router>
-      {" "}
-      {/* Router wraps everything */}
       <AuthProvider>
         <CartProvider>
           <AppRoutes />
+          <Toaster />
         </CartProvider>
       </AuthProvider>
     </Router>

@@ -91,7 +91,7 @@ const ProductsPage = () => {
   );
   const cartItemCount = cart.length;
   const handleSignIn = () => {
-    navigate("/auth");
+    navigate("/login");
   };
 
   return (
