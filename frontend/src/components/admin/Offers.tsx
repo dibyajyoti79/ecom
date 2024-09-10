@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import toast from "react-hot-toast";
 
 const Offers = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [offerData, setOfferData] = useState({
     discount: 0,
     fromDate: "",
@@ -35,7 +37,7 @@ const Offers = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch offer data");
       }
-      const data = await response.json();
+      const { data } = await response.json();
       setOfferData({
         discount: data.discount,
         fromDate: data.fromDate,
@@ -86,7 +88,7 @@ const Offers = () => {
     if (!validateForm()) {
       return; // Do not submit if validation fails
     }
-
+    setLoading(true);
     try {
       const response = await fetch("/api/v1/offers/special", {
         method: "PUT",
@@ -105,8 +107,12 @@ const Offers = () => {
         toDate: updatedOffer.toDate,
       });
       setIsDialogOpen(false);
-    } catch (error) {
+      fetchOffer();
+    } catch (error: any) {
+      toast.error(error.message);
       console.error("Failed to update offer:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,34 +124,56 @@ const Offers = () => {
         </CardHeader>
         <CardContent className="p-4">
           <div className="space-y-4">
-            <div className="flex justify-between">
-              <span className="text-gray-600 font-medium">Discount:</span>
-              <span className="text-gray-800 font-semibold">
-                {offerData.discount}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600 font-medium">Valid From:</span>
-              <span className="text-gray-800 font-semibold">
-                {offerData.fromDate}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600 font-medium">Valid Until:</span>
-              <span className="text-gray-800 font-semibold">
-                {offerData.toDate}
-              </span>
-            </div>
+            {offerData.discount ? (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 font-medium">Discount:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {offerData.discount}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 font-medium">Valid From:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {offerData.fromDate}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 font-medium">
+                    Valid Until:
+                  </span>
+                  <span className="text-gray-800 font-semibold">
+                    {offerData.toDate}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="text-center">
+                <p className="text-gray-600">No special offer available</p>
+              </div>
+            )}
             <div className="flex justify-center mt-6">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger>
-                  <Button className="text-white font-bold py-2 px-6 rounded-full transition duration-300 ease-in-out">
-                    Modify Offer
+                  <Button
+                    className="text-white font-bold py-2 px-6 rounded-full transition duration-300 ease-in-out"
+                    onClick={() => {
+                      setIsDialogOpen(true);
+                    }}
+                  >
+                    {offerData.discount ? "Modify Offer" : "Create Offer"}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="p-6 bg-white rounded-lg shadow-md">
+                <DialogContent
+                  className="p-6 bg-white rounded-lg shadow-md"
+                  onInteractOutside={(e) => {
+                    e.preventDefault(); // Prevent closing on outside click
+                  }}
+                >
                   <DialogHeader>
-                    <DialogTitle>Edit Offer</DialogTitle>
+                    <DialogTitle>
+                      {offerData.discount ? "Edit Offer" : "Create Offer"}
+                    </DialogTitle>
                   </DialogHeader>
                   <form
                     className="space-y-4"
@@ -201,8 +229,9 @@ const Offers = () => {
                       <Button
                         className="bg-green-600 text-white font-bold py-2 px-6 rounded-full"
                         onClick={handleSubmit}
+                        disabled={loading}
                       >
-                        Save Changes
+                        {loading ? "Saving..." : "Save Changes"}
                       </Button>
                     </div>
                   </form>
