@@ -24,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsAuthenticated(true);
       setUser(JSON.parse(storedUser));
     }
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -109,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <AuthContext.Provider
       value={{ isAuthenticated, user, login, register, logout }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

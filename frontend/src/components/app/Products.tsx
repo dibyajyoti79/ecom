@@ -15,7 +15,7 @@ const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const reponse = await fetch("/api/v1/product/get-all");
+        const reponse = await fetch("/api/v1/products");
 
         if (!reponse.ok) {
           const errorData = await reponse.json();

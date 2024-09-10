@@ -1,102 +1,166 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { ProductTable } from "./ProductTable";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import ProductInfo from "@/components/admin/ProductInfo";
+import toast from "react-hot-toast";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
-  imageUrl: string;
+  stock: number;
 }
 
-// Dummy data for demonstration purposes
-const dummyProducts: Product[] = [
-  {
-    id: "1",
-    name: "Wireless Earbuds",
-    description:
-      "Compact and stylish wireless earbuds with noise cancellation.",
-    price: 2999,
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  {
-    id: "2",
-    name: "Smartwatch",
-    description:
-      "Feature-packed smartwatch with fitness tracking and notifications.",
-    price: 4999,
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  // Add more products as needed
-];
-
 const AdminPanel = () => {
-  const [products, setProducts] = useState<Product[]>(dummyProducts);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("/api/v1/products");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch products");
+      }
+      const data = await response.json();
+      setProducts(data.data.products);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    // Implement logic to open edit modal or navigate to edit page
+    setSelectedProduct(product);
+    setIsDialogOpen(true);
   };
 
-  const handleDelete = (productId: string) => {
-    setProducts(products.filter((product) => product.id !== productId));
-    // Implement logic to delete product from backend
+  const handleDelete = async (productId: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+    if (!confirmDelete) return;
+    try {
+      const response = await fetch(`/api/v1/products/${productId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete product");
+      }
+
+      fetchProducts();
+    } catch (error: any) {
+      toast.error(error.message);
+      console.error("Failed to delete product:", error);
+    }
   };
 
   const handleAddNewProduct = () => {
-    // Implement logic to open add product modal or navigate to add product page
+    setSelectedProduct(null);
+    setIsDialogOpen(true);
   };
 
-  return (
-    <div className="p-6">
-      <div className="mb-4">
-        <Button
-          onClick={handleAddNewProduct}
-          className="bg-blue-500 text-white"
-        >
-          Add New Product
-        </Button>
-      </div>
-      <div className="overflow-x-auto">
-        <ul className="divide-y divide-gray-200">
-          {products.map((product) => (
-            <li
-              key={product.id}
-              className="flex items-center justify-between p-4"
+  const closeDialog = () => {
+    setSelectedProduct(null);
+    setIsDialogOpen(false);
+  };
+
+  const columns: ColumnDef<Product>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+    },
+    {
+      accessorKey: "stock",
+      header: "Stock",
+    },
+    {
+      accessorKey: "price",
+      header: "Price",
+    },
+    {
+      accessorKey: "action",
+      header: "Action",
+      cell: ({ row }) => {
+        return (
+          <div className="flex gap-4">
+            <Button onClick={() => handleEdit(row.original)}>Edit</Button>
+            <Button
+              variant="destructive"
+              onClick={() => handleDelete(row.original._id)}
             >
-              <div className="flex-1 flex items-center">
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="h-16 w-16 object-cover mr-4"
-                />
-                <div>
-                  <h3 className="text-lg font-semibold">{product.name}</h3>
-                  <p className="text-sm text-gray-500">{product.description}</p>
-                  <p className="text-sm font-medium">
-                    ₹{product.price.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                <Button
-                  onClick={() => handleEdit(product)}
-                  className="text-yellow-600"
-                >
-                  <Edit size={16} />
-                </Button>
-                <Button
-                  onClick={() => handleDelete(product.id)}
-                  className="text-red-600"
-                >
-                  <Trash size={16} />
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+              Delete
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  return (
+    <div className="p-6 relative min-h-screen">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Admin</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <div className="mt-4">
+        <Button onClick={handleAddNewProduct}>Add New Product</Button>
+
+        <Dialog open={isDialogOpen} onOpenChange={closeDialog}>
+          <DialogContent
+            onInteractOutside={(e) => {
+              e.preventDefault(); // Prevent closing on outside click
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>
+                {selectedProduct ? "Edit Product" : "Add a New Product"}
+              </DialogTitle>
+            </DialogHeader>
+            <ProductInfo
+              product={selectedProduct || undefined}
+              fetchProducts={fetchProducts}
+              setIsDialogOpen={setIsDialogOpen}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="mx-auto my-4">
+        <ProductTable columns={columns} data={products} />
       </div>
     </div>
   );
