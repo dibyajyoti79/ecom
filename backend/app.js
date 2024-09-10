@@ -17,8 +17,10 @@ app.use(cookieParser());
 import { errorMiddleware } from "./middleware/error.middleware.js";
 
 import userRoutes from "./routes/user.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/product", productRoutes);
 
 // error handler middleware
 app.use(errorMiddleware);

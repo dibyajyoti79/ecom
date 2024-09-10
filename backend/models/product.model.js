@@ -18,22 +18,6 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: [true, "product stock required"],
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-    },
-    images: [
-      {
-        public_id: {
-          type: String,
-          default: "",
-        },
-        url: {
-          type: String,
-          default: "",
-        },
-      },
-    ],
   },
   { timestamps: true }
 );
