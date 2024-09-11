@@ -59,11 +59,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleAddToCart = () => {
     if (!itemInCart) {
+      const discountPrice =
+        discount > 0 ? (price - (price * discount) / 100).toFixed(2) : price;
       setQuantity(1);
       addToCart({
         id,
         name,
-        price,
+        price: Number(discountPrice),
         quantity: 1,
       });
     }
@@ -79,14 +81,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
       </CardHeader>
       <CardContent className="p-4 flex justify-between items-center">
         <div className="space-y-1">
-          <h3 className="text-lg font-bold">
-            <span className="text-green-600">
-              ₹{(price - (price * discount) / 100).toFixed(2)}
-            </span>
-          </h3>
-          <h3 className="text-lg font-bold">
-            {discount > 0 ? (
-              <>
+          {discount > 0 ? (
+            <>
+              <h3 className="text-lg font-bold">
+                <span className="text-green-600">
+                  ₹{(price - (price * discount) / 100).toFixed(2)}
+                </span>
+              </h3>
+              <h3 className="text-lg font-bold">
                 <span className="line-through text-gray-500">
                   ₹{price.toFixed(2)}
                 </span>
@@ -94,11 +96,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <span className="ml-1 text-sm text-red-500">
                   ({discount}% off)
                 </span>
-              </>
-            ) : (
-              <span>₹{price.toFixed(2)}</span>
-            )}
-          </h3>
+              </h3>
+            </>
+          ) : (
+            <span className="text-lg font-bold">₹{price.toFixed(2)}</span>
+          )}
+
           {stock > 0 ? (
             <p className="text-green-500 text-sm">In Stock</p>
           ) : (
