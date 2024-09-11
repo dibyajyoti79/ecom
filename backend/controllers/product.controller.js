@@ -3,15 +3,26 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import Log from "../models/log.model.js";
+import Offer from "../models/offer.model.js";
 
 export const getAllProducts = asyncHandler(async (req, res, next) => {
   const products = await Product.find({});
+  const offer = await Offer.findOne({});
+  let discount = 0;
+  // check if offer is applicabale for today
+  if (
+    offer &&
+    new Date() >= new Date(offer.fromDate) &&
+    new Date() <= new Date(offer.toDate)
+  ) {
+    discount = offer.discount;
+  }
   res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        { totalProducts: products.length, products },
+        { totalProducts: products.length, products, discount },
         "All products fetched successfully"
       )
     );
