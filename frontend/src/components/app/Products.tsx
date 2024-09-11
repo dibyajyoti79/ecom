@@ -43,7 +43,7 @@ const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
   );
 
   return (
-    <div className="flex flex-wrap gap-6">
+    <div className="flex flex-wrap gap-4">
       {loading && (
         <div className="text-center w-full">
           <p className="text-gray-600 text-lg font-semibold">Loading...</p>
