@@ -11,6 +11,7 @@ interface Product {
 
 const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [discount, setDiscount] = useState<number>(0);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -23,6 +24,7 @@ const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
         }
         const data = await reponse.json();
         setProducts(data.data.products);
+        setDiscount(data.data.discount);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
@@ -46,6 +48,7 @@ const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
           description={product.description}
           price={product.price}
           stock={product.stock}
+          discount={discount}
         />
       ))}
     </div>

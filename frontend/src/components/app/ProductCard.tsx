@@ -16,6 +16,7 @@ interface ProductCardProps {
   description: string;
   price: number;
   stock: number;
+  discount: number;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -24,6 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   description,
   price,
   stock,
+  discount,
 }) => {
   const { cart, addToCart, updateQuantity } = useCart();
   const [quantity, setQuantity] = useState<number>(0);
@@ -77,7 +79,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
       </CardHeader>
       <CardContent className="p-4 flex justify-between items-center">
         <div className="space-y-1">
-          <h3 className="text-lg font-bold">₹{price.toFixed(2)}</h3>
+          <h3 className="text-lg font-bold">
+            <span className="text-green-600">
+              ₹{(price - (price * discount) / 100).toFixed(2)}
+            </span>
+          </h3>
+          <h3 className="text-lg font-bold">
+            {discount > 0 ? (
+              <>
+                <span className="line-through text-gray-500">
+                  ₹{price.toFixed(2)}
+                </span>
+
+                <span className="ml-1 text-sm text-red-500">
+                  ({discount}% off)
+                </span>
+              </>
+            ) : (
+              <span>₹{price.toFixed(2)}</span>
+            )}
+          </h3>
           {stock > 0 ? (
             <p className="text-green-500 text-sm">In Stock</p>
           ) : (
@@ -103,7 +124,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </Button>
           </div>
         ) : (
-          <Button onClick={handleAddToCart} className="mt-auto">
+          <Button
+            onClick={handleAddToCart}
+            className="mt-auto"
+            disabled={stock === 0}
+          >
             Add to Cart
           </Button>
         )}
