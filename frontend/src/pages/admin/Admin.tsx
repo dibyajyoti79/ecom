@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ProductTable } from "./ProductTable";
+import { ProductTable } from "../../components/admin/ProductTable";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

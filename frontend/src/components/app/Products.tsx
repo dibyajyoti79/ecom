@@ -12,9 +12,11 @@ interface Product {
 const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [discount, setDiscount] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
         const reponse = await fetch("/api/v1/products");
 
@@ -27,6 +29,8 @@ const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
         setDiscount(data.data.discount);
       } catch (error) {
         console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -40,17 +44,33 @@ const ProductsPage = ({ searchTerm }: { searchTerm: string }) => {
 
   return (
     <div className="flex flex-wrap gap-6">
-      {filteredProducts?.map((product) => (
-        <ProductCard
-          key={product._id}
-          id={product._id}
-          name={product.name}
-          description={product.description}
-          price={product.price}
-          stock={product.stock}
-          discount={discount}
-        />
-      ))}
+      {loading && (
+        <div className="text-center w-full">
+          <p className="text-gray-600 text-lg font-semibold">Loading...</p>
+        </div>
+      )}
+      {!loading && filteredProducts?.length === 0 && (
+        <div className="text-center w-full">
+          <p className="text-gray-600 text-lg font-semibold">
+            No products found
+          </p>
+        </div>
+      )}
+      {!loading && filteredProducts?.length > 0 && (
+        <>
+          {filteredProducts?.map((product) => (
+            <ProductCard
+              key={product._id}
+              id={product._id}
+              name={product.name}
+              description={product.description}
+              price={product.price}
+              stock={product.stock}
+              discount={discount}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 };

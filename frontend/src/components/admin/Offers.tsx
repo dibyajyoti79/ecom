@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 const Offers = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingOffer, setLoadingOffer] = useState(false);
   const [offerData, setOfferData] = useState({
     discount: 0,
     fromDate: "",
@@ -33,6 +34,7 @@ const Offers = () => {
   // Fetch offer data from the API
   const fetchOffer = async () => {
     try {
+      setLoadingOffer(true);
       const response = await fetch("/api/v1/offers/special");
       if (!response.ok) {
         throw new Error("Failed to fetch offer data");
@@ -50,6 +52,8 @@ const Offers = () => {
       });
     } catch (error) {
       console.error("Failed to fetch offer:", error);
+    } finally {
+      setLoadingOffer(false);
     }
   };
 
@@ -123,122 +127,131 @@ const Offers = () => {
           <CardTitle className="text-2xl font-bold">Special Offer</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
-          <div className="space-y-4">
-            {offerData.discount ? (
-              <>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Discount:</span>
-                  <span className="text-gray-800 font-semibold">
-                    {offerData.discount}%
-                  </span>
+          {loadingOffer && (
+            <div className="text-center">
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          )}
+          {!loadingOffer && (
+            <div className="space-y-4">
+              {offerData.discount ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 font-medium">Discount:</span>
+                    <span className="text-gray-800 font-semibold">
+                      {offerData.discount}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 font-medium">
+                      Valid From:
+                    </span>
+                    <span className="text-gray-800 font-semibold">
+                      {offerData.fromDate}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 font-medium">
+                      Valid Until:
+                    </span>
+                    <span className="text-gray-800 font-semibold">
+                      {offerData.toDate}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-600">No special offer available</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Valid From:</span>
-                  <span className="text-gray-800 font-semibold">
-                    {offerData.fromDate}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">
-                    Valid Until:
-                  </span>
-                  <span className="text-gray-800 font-semibold">
-                    {offerData.toDate}
-                  </span>
-                </div>
-              </>
-            ) : (
-              <div className="text-center">
-                <p className="text-gray-600">No special offer available</p>
-              </div>
-            )}
-            <div className="flex justify-center mt-6">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger>
-                  <Button
-                    className="text-white font-bold py-2 px-6 rounded-full transition duration-300 ease-in-out"
-                    onClick={() => {
-                      setIsDialogOpen(true);
+              )}
+              <div className="flex justify-center mt-6">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger>
+                    <Button
+                      className="text-white font-bold py-2 px-6 rounded-full transition duration-300 ease-in-out"
+                      onClick={() => {
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      {offerData.discount ? "Modify Offer" : "Create Offer"}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent
+                    className="p-6 bg-white rounded-lg shadow-md"
+                    onInteractOutside={(e) => {
+                      e.preventDefault(); // Prevent closing on outside click
                     }}
                   >
-                    {offerData.discount ? "Modify Offer" : "Create Offer"}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent
-                  className="p-6 bg-white rounded-lg shadow-md"
-                  onInteractOutside={(e) => {
-                    e.preventDefault(); // Prevent closing on outside click
-                  }}
-                >
-                  <DialogHeader>
-                    <DialogTitle>
-                      {offerData.discount ? "Edit Offer" : "Create Offer"}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form
-                    className="space-y-4"
-                    onSubmit={(e) => e.preventDefault()}
-                  >
-                    <div>
-                      <Label htmlFor="discount">Discount</Label>
-                      <Input
-                        id="discount"
-                        name="discount"
-                        type="number"
-                        value={modalData.discount}
-                        onChange={handleInputChange}
-                        className="w-full mt-1"
-                        required
-                      />
-                      {errors.discount && (
-                        <p className="text-red-500 text-sm">
-                          {errors.discount}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <Label htmlFor="fromDate">Valid From</Label>
-                      <Input
-                        id="fromDate"
-                        name="fromDate"
-                        type="date"
-                        value={modalData.fromDate}
-                        onChange={handleInputChange}
-                        className="w-full mt-1"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="toDate">Valid Until</Label>
-                      <Input
-                        id="toDate"
-                        name="toDate"
-                        type="date"
-                        value={modalData.toDate}
-                        onChange={handleInputChange}
-                        className="w-full mt-1"
-                        required
-                      />
-                      {errors.dateRange && (
-                        <p className="text-red-500 text-sm">
-                          {errors.dateRange}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex justify-end">
-                      <Button
-                        className="bg-green-600 text-white font-bold py-2 px-6 rounded-full"
-                        onClick={handleSubmit}
-                        disabled={loading}
-                      >
-                        {loading ? "Saving..." : "Save Changes"}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
+                    <DialogHeader>
+                      <DialogTitle>
+                        {offerData.discount ? "Edit Offer" : "Create Offer"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <form
+                      className="space-y-4"
+                      onSubmit={(e) => e.preventDefault()}
+                    >
+                      <div>
+                        <Label htmlFor="discount">Discount</Label>
+                        <Input
+                          id="discount"
+                          name="discount"
+                          type="number"
+                          value={modalData.discount}
+                          onChange={handleInputChange}
+                          className="w-full mt-1"
+                          required
+                        />
+                        {errors.discount && (
+                          <p className="text-red-500 text-sm">
+                            {errors.discount}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor="fromDate">Valid From</Label>
+                        <Input
+                          id="fromDate"
+                          name="fromDate"
+                          type="date"
+                          value={modalData.fromDate}
+                          onChange={handleInputChange}
+                          className="w-full mt-1"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="toDate">Valid Until</Label>
+                        <Input
+                          id="toDate"
+                          name="toDate"
+                          type="date"
+                          value={modalData.toDate}
+                          onChange={handleInputChange}
+                          className="w-full mt-1"
+                          required
+                        />
+                        {errors.dateRange && (
+                          <p className="text-red-500 text-sm">
+                            {errors.dateRange}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex justify-end">
+                        <Button
+                          className="bg-green-600 text-white font-bold py-2 px-6 rounded-full"
+                          onClick={handleSubmit}
+                          disabled={loading}
+                        >
+                          {loading ? "Saving..." : "Save Changes"}
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
