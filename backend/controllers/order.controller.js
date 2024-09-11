@@ -26,7 +26,7 @@ export const createCheckoutSession = asyncHandler(async (req, res, next) => {
     },
     customer_email: req.user.email,
     success_url: `${process.env.CLIENT_URL}/success`,
-    cancel_url: `${process.env.CLIENT_URL}/cancel`,
+    cancel_url: `${process.env.CLIENT_URL}/failed`,
   });
 
   res

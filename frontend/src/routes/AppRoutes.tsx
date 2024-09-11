@@ -6,6 +6,8 @@ import NotFound from "@/pages/NotFound";
 import SignUp from "@/pages/auth/Signup";
 import Login from "@/pages/auth/Login";
 import HomePage from "@/pages/Home/HomePage";
+import Success from "@/pages/Success";
+import Failed from "@/pages/Faield";
 
 const AppRoutes = () => {
   const { isAuthenticated, user } = useAuth();
@@ -29,6 +31,8 @@ const AppRoutes = () => {
       />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/success" element={<Success />} />
+      <Route path="/failed" element={<Failed />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
