@@ -28,6 +28,13 @@ app.use("/api/v1/logs", logRoutes);
 app.use("/api/v1/offers", offerRoutes);
 app.use("/api/v1/order", orderRoutes);
 
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
+
 // error handler middleware
 app.use(errorMiddleware);
 export { app };
